@@ -11,5 +11,10 @@ form {
 }
 
 body {
+  background-color: orange;
+}
+
+#main-container {
+  background-color: white;
   text-align: center;
 }
