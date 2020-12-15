@@ -1,3 +1,6 @@
+// HELPER FUNCTIONS
+
+// Quickly add an array of values into a given selection field
 function addSelectOptions(array, selectID) {
   const selectElement = document.getElementById(selectID);
   array.forEach((value) => {
@@ -6,8 +9,43 @@ function addSelectOptions(array, selectID) {
   });
 }
 
-// Student name select
+// Take the month name and extrapolate which worksheet to reference
+function getSheetName(monthInput) {
+  let monthAsNumber = months.indexOf(monthInput);
+  console.log(monthAsNumber);
+  return monthInput == "December" ? "2020" : `2021-0${monthAsNumber}`;
+}
 
+// Create a fresh "session info" section
+function createNewSessionInfoDiv() {
+  document.getElementById("session-info").innerHTML = `
+    <div class="mb-3">
+        <label for="select-session">Select Session:</label>
+        <br />
+        <select name="select-session" id="select-session"></select>
+    </div>
+    <button id="book-session" class="btn btn-success">Book Session</button>`;
+}
+
+// Clear existing session information and/or results
+function hideSessions() {
+  document.getElementById("session-info").innerHTML = "";
+  document.getElementById("result-display").innerHTML = "";
+}
+
+// Success message for when a session is booked
+function displaySuccess() {
+  let bookingMessage = document.createElement("h3");
+  bookingMessage.classList.add("text-success");
+  bookingMessage.textContent = "Session booked!";
+  document
+    .getElementById("result-display")
+    .insertAdjacentElement("afterbegin", bookingMessage);
+}
+
+// POPULATE INPUT FIELDS
+
+// STUDENT NAME SELECTION
 let studentNames = [
   "Sandra",
   "Ilya",
@@ -21,11 +59,11 @@ let studentNames = [
 
 addSelectOptions(studentNames, "select-student");
 
-// Month select
-let today = new Date();
-let currentMonth = today.getMonth() + 1;
-console.log(currentMonth);
+// MONTH SELECTION
+let today = new Date(); // Returns today
+let currentMonth = today.getMonth() + 1; // Returns today's month + 1
 
+// Array of relevant months to the course
 let months = [
   "December",
   "January",
@@ -36,20 +74,20 @@ let months = [
   "June",
 ];
 
+// Remove months which have already passed
 let relevantMonths = months.filter((month, index) => {
   if (currentMonth == 12) {
+    // If it's December, show all months
     return month;
   } else if (index >= currentMonth) {
+    // Otherwise, only return months after this one
     return month;
   }
 });
 
 addSelectOptions(relevantMonths, "select-month");
 
-//Date select
-//TODO
-
-// Tutor select
+// TUTOR SELECTION
 
 let tutors = ["Anna", "Raafat", "Taimur", "Thomas"];
 addSelectOptions(tutors, "select-tutor");
@@ -57,24 +95,28 @@ addSelectOptions(tutors, "select-tutor");
 // Populate sessions
 
 let findSessionsButton = document.getElementById("find-available-sessions");
-
-function getSheetName(monthInput) {
-  let monthAsNumber = months.indexOf(monthInput);
-  console.log(monthAsNumber);
-  return monthInput == "December" ? "2020" : `2021-0${monthAsNumber}`;
-}
+findSessionsButton.addEventListener("click", (e) => {
+  e.preventDefault(); // Stop the page from reloading
+  createNewSessionInfoDiv(); // Create space for session info
+  findSessions(); // Find and populate sessions
+});
 
 function findSessions() {
+  // Grab results from the selection menus
   let student = document.getElementById("select-student").value;
   let month = document.getElementById("select-month").value;
   let sheetName = getSheetName(month);
   let tutor = document.getElementById("select-tutor").value;
 
+  // Fetch available sessions from sheet2api
   var query_params = new URLSearchParams({
     query_type: "and",
     tutorName: tutor,
     studentName: 0,
   });
+
+  // Here I use a template literal to insert the correct sheet name
+  // based on which month is selected
   var url =
     `https://sheet2api.com/v1/paUjQAhERJWr/tutor-session-booking/${sheetName}?` +
     query_params;
@@ -82,16 +124,21 @@ function findSessions() {
   fetch(url)
     .then((response) => response.json())
     .then((availableSessions) => {
+      // If no sessions available: display a message
       if (availableSessions.length === 0) {
         document.getElementById("session-info").textContent =
           "Sorry, there are no sessions available with those selections";
       } else {
+        // Create an array of available sessions
+        // with strings formatted for the selection dropdown
         let sessionList = availableSessions.map((session) => {
           return `${session.sessionDate}: ${session.sessionStartTime.slice(
             0,
             4
           )} PM to ${session.sessionEndTime.slice(0, 4)} PM`;
         });
+
+        // Create an object with the basic building blocks of our request
         let bookingBaseObject = {
           studentName: student,
           tutorName: tutor,
@@ -99,7 +146,7 @@ function findSessions() {
         };
 
         addSelectOptions(sessionList, "select-session");
-        createSessionBooker(bookingBaseObject);
+        createSessionBooker(bookingBaseObject); // Creates onclick for booking button
       }
     })
     .catch((error) => {
@@ -107,21 +154,7 @@ function findSessions() {
     });
 }
 
-findSessionsButton.addEventListener("click", (e) => {
-  e.preventDefault();
-  createNewSessionInfoDiv();
-  findSessions();
-});
-
-function createNewSessionInfoDiv() {
-  document.getElementById(
-    "session-info"
-  ).innerHTML = ` <div class="mb-3">       <label for="select-session"
-          >Select Session: </label><br /><select name="select-session" id="select-session"></select
-        ></div>
-        <button id="book-session" class="btn btn-success">Book Session</button>`;
-}
-// Book an available session
+// Function for creating the "Book Session" onclick
 
 function createSessionBooker(bookingBaseObject) {
   document.getElementById("book-session").addEventListener("click", (e) => {
@@ -137,6 +170,9 @@ function createSessionBooker(bookingBaseObject) {
     bookSession(bookingInfo);
   });
 }
+
+// Function for querying the database and updating the relevant session
+// with the student's name
 
 function bookSession(bookingInfo) {
   let sheetName = bookingInfo.sheetName;
@@ -170,20 +206,6 @@ function bookSession(bookingInfo) {
     .catch((error) => {
       console.error("Error:", error);
     });
-}
-
-function hideSessions() {
-  document.getElementById("session-info").innerHTML = "";
-  document.getElementById("result-display").innerHTML = "";
-}
-
-function displaySuccess() {
-  let bookingMessage = document.createElement("h3");
-  bookingMessage.classList.add("text-success");
-  bookingMessage.textContent = "Session booked!";
-  document
-    .getElementById("result-display")
-    .insertAdjacentElement("afterbegin", bookingMessage);
 }
 
 // Copy input field function
