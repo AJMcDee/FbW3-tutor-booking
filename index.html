@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutor</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="container d-flex flex-column align-items-center w-50 my-5">
+    <h1>FbW3 Student Tutoring Signup Form</h1>
+    <p class="lead w-75">
+      Please use the below form to search for available sessions and sign up at
+      your convenience. To check your existing sessions, please check the
+      spreadsheet
+      <a
+        href="https://docs.google.com/spreadsheets/d/1sMFqWPhJ1RZIGq3eD1mjQJs5XIAodTVonDF5GR2Oduc/edit?usp=sharing"
+        >directly on Google Sheets</a
+      >.
+    </p>
+    <!-- <input
+      type="text"
+      value="https://docs.google.com/spreadsheets/d/1sMFqWPhJ1RZIGq3eD1mjQJs5XIAodTVonDF5GR2Oduc/edit?usp=sharing"
+      id="sheetURL"
+      size="70"
+      class="my-1"
+    />
+    <br />
+    <button onclick="copyURL" class="btn btn-primary">Copy URL</button> -->
+    <form action="" class="my-3">
+      <div class="mb-3">
+        <label for="select-student">Student Name:</label>
+        <select
+          name="select-student"
+          id="select-student"
+          onchange="hideSessions()"
+        ></select>
+      </div>
+      <div class="mb-3">
+        <label for="select-tutor">Select Tutor:</label>
+        <select
+          name="select-tutor"
+          id="select-tutor"
+          onchange="hideSessions()"
+        ></select>
+      </div>
+      <div class="mb-3">
+        <label for="select-month">Select Month:</label>
+        <select
+          name="select-month"
+          id="select-month"
+          onchange="hideSessions()"
+        ></select>
+      </div>
+
+      <button id="find-available-sessions" class="btn btn-primary">
+        Find Available Sessions
+      </button>
+    </form>
+    <form>
+      <div id="session-info"></div>
+    </form>
+    <div id="result-display"></div>
+    <script src="script.js"></script>
+    <script src="https://sheet2api.com/v1/template.js"></script>
+  </body>
+</html>
