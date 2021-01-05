@@ -89,7 +89,7 @@ addSelectOptions(relevantMonths, "select-month");
 
 // TUTOR SELECTION
 
-let tutors = ["Anna", "Raafat", "Taimur", "Thomas"];
+let tutors = ["Anna", "Dominik", "Raafat", "Taimur", "Thomas"];
 addSelectOptions(tutors, "select-tutor");
 
 // Populate sessions
@@ -176,6 +176,7 @@ function createSessionBooker(bookingBaseObject) {
 
 function bookSession(bookingInfo) {
   let sheetName = bookingInfo.sheetName;
+  console.log(sheetName);
   let query_params = new URLSearchParams({
     query_type: "and",
     tutorName: bookingInfo.tutorName,
